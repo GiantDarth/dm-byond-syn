@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DM (Byond) for GtkSourceView
+
+Writer: Christopher Robert Philabaum <chaos7theory@live.com>
+Copyright (C) 2013 Christopher Robert Philabaum <chaos7theory@live.com>
+	
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Adding new GtkSourceView Language/Syntax highlighing:
+	http://live.gnome.org/Gedit/NewLanguage
+GtkSourceView Language Definition v2.0 Tutorial:
+	https://developer.gnome.org/gtksourceview/stable/lang-tutorial.html
+GtkSourceView Language Definition v2.0 Reference:
+	https://developer.gnome.org/gtksourceview/stable/lang-reference.html
+-->
+
+<!--
+GtkSourceView is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+GtkSourceView is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+-->
+
+<language id="dm-byond" _name="DM (Byond)" version="2.0" _section="Sources">
+	<metadata>
+		<property name="mimetypes">text/x-dm-byond</property>
+		<property name="globs">*.dm;*.dme;*.dmf;*.dmm;*.dms;*.int"</property>
+		<property name="line-comment-start">//</property>
+		<property name="block-comment-start">/*</property>
+		<property name="block-comment-end">*/</property>
+	</metadata>
+
+	<styles>
+		<style id="comment" _name="Comment" map-to="def:comment"/>
+		<style id="error" _name="Error" map-to="def:error"/>
+		<style id="type" _name="Data Type" map-to="def:type"/>
+		<style id="string" _name="String" map-to="def:string"/>
+		<style id="escaped-character" _name="Escaped Character" 
+			map-to="def:special-char"/>
+		<style id="keyword" _name="Keyword" map-to="def:keyword"/>
+		<style id="preprocessor" _name="Preprocessor" 
+			map-to="def:preprocessor"/>
+		<style id="null-value" _name="Null Value" 
+			map-to="def:special-constant"/>
+		<style id="decimal" _name="Decimal number" map-to="def:decimal"/>
+		<style id="real" _name="Real number" map-to="def:floating-point"/>
+	</styles>
+
+	<definitions>
+		<context id="dm-byond" class="no-spell-check">
+			<include>
+				<context ref="string"/>
+				<context ref="file-string"/>
+				<context ref="multiline-string"/>
+				<context ref="line-comment"/>
+				<context ref="multiline-comment"/>
+				<context ref="close-comment-outside-comment"/>
+				<context ref="preprocessor"/>
+				<context ref="include"/>
+				<context ref="keywords"/>
+				<context ref="primitives"/>
+				<context ref="null-value"/>
+				<context ref="decimal"/>
+				<context ref="real"/>
+			</include>
+		</context>
+		
+		<define-regex id="preproc-start">^\s*#\s*</define-regex>
+	
+		<context id="line-comment" style-ref="comment" end-at-line-end="true" 
+			class="comment" class-disabled="no-spell-check">
+			<start>//</start>
+			<include>
+				<context ref="def:in-line-comment"/>
+			</include>
+		</context>
+
+		<context id="multiline-comment" style-ref="comment" class="comment" 
+			class-disabled="no-spell-check">
+			<start>/\*</start>
+			<end>\*/</end>
+			<include>
+				<context ref="def:in-comment"/>
+			</include>
+		</context>
+
+		<context id="close-comment-outside-comment" style-ref="error">
+			<match>\*/(?!\*)</match>
+		</context>
+
+		<context id="if-false-comment" style-ref="comment">
+			<start>\%{preproc-start}if\s*0\b</start>
+ 			<end>\%{preproc-start}(endif|else|elif)\b</end>
+			<include>
+				<context id="if-in-if-false">
+					<start>\%{preproc-start}if(n?def)?\b</start>
+					<end>\%{preproc-start}endif\b</end>
+					<include>
+						<context ref="if-in-if-false"/>
+						<context ref="def:in-comment"/>
+					</include>
+				</context>
+				<context ref="def:in-comment"/>
+			</include>
+		</context>
+
+		<context id="preprocessor" style-ref="preprocessor" 
+			end-at-line-end="true">
+			<start extended="true">
+				\%{preproc-start}
+				(include|define|undef|if(n?def)?|else|elif|endif|error|warn)
+				\b
+			</start>
+			<include>
+ 				<context ref="line-comment"/>
+				<context ref="multiline-comment"/>
+			</include>
+		</context>
+		
+		<context id="include" style-ref="preprocessor">
+			<match>\%{preproc-start}include (".*"|&lt;.*&gt;)</match>
+			<include>
+				<context id="included-file" sub-pattern="2"
+                	 style-ref="string"/>
+ 			</include>
+		</context>
+
+		<!-- FIXME Based upon the DM Reference, so some may be missing. -->
+		<context id="keywords" style-ref="keyword">
+			<keyword>new</keyword>
+			<keyword>del</keyword>
+			<keyword>as</keyword>
+			<keyword>in</keyword>
+			<keyword>if</keyword>
+			<keyword>else</keyword>
+			<keyword>switch</keyword>
+			<keyword>for</keyword>
+			<keyword>while</keyword>
+			<keyword>do</keyword>
+			<keyword>break</keyword>
+			<keyword>continue</keyword>
+			<keyword>goto</keyword>
+			<keyword>return</keyword>
+		</context>
+
+		<!-- FIXME Based upon the DM Reference, so some may be missing. -->
+	    <context id="primitives" style-ref="type">
+	    	<keyword>datum</keyword>
+	    	<keyword>atom</keyword>
+			<keyword>area</keyword>
+			<keyword>turf</keyword>
+			<keyword>obj</keyword>
+			<keyword>mob</keyword>
+			<keyword>var</keyword>
+			<keyword>list</keyword>
+			<keyword>tmp</keyword>
+			<keyword>const</keyword>
+			<keyword>proc</keyword>
+			<keyword>verb</keyword>
+			<keyword>text</keyword>
+			<keyword>message</keyword>
+			<keyword>sound</keyword>
+			<keyword>icon</keyword>
+			<keyword>image</keyword>
+			<keyword>client</keyword>
+			<keyword>world</keyword>
+			<keyword>file</keyword>
+			<keyword>savefile</keyword>
+			<keyword>usr</keyword>
+			<keyword>src</keyword>
+			<keyword>world</keyword>
+		</context>
+		
+		<context id="null-value" style-ref="null-value">
+			<keyword>null</keyword>
+		</context>
+
+		<!-- FIXME Taken from C# and don't know what it all means. -->
+		<context id="decimal" style-ref="decimal">
+			<match extended="true">
+				(?&lt;![\w\.])
+				[0-9]+
+				(?![\w\.])
+			</match>
+		</context>
+
+		<!-- FIXME Taken from C# and don't know what it all means. -->
+		<context id="real" style-ref="real">
+			<match extended="true">
+				(?&lt;![\w\.])
+				((\.[0-9]+|[0-9]+\.[0-9]*)([Ee][+-]?[0-9]*)?|
+				([0-9]+[Ee][+-]?[0-9]*) |
+				([0-9]+))
+				(?![\w\.])
+			</match>
+		</context>
+		
+		<!-- Recursive allowing an indefinite amount of nested brackets. -->
+		<define-regex id="escaped-brackets" extended="true">
+			\[(([^\[\]]*|(?R))*)\]
+		</define-regex>
+		
+		<!-- FIXME Based upon the DM Reference, so some may be missing. -->
+		<define-regex id="escaped-character" extended="true">
+			\\(								# Leading backslash
+			th(e)?|The|[Aa](n)? |
+			[Hh]e(r(s(elf)?)?)?|[Ss]he|[Hh]is|[Hh]im(self)? |
+			proper|improper|[Rr]oman |
+			icon\%{escaped-brackets}|ref\%{escaped-brackets} |
+			# \... \s \n \" \\ \lessthan \greaterthan \[ \] \(space) \(newline)
+			\.\.\.|s|n|\"|\\|&lt;|&gt;|\[|\]|&#xA0;|\n
+			)		
+		</define-regex>
+
+		<context id="string" style-ref="string" end-at-line-end="true" 
+			class="string" class-disabled="no-spell-check">
+			<start>\"</start>
+			<end>\"</end>
+			<include>
+				<context id="escaped-character" style-ref="escaped-character">
+					<match>\%{escaped-character}</match>
+				</context>
+				<context id="escaped-brackets" style-ref="escaped-character">
+					<match>\%{escaped-brackets}</match>
+				</context>
+				<context ref="def:line-continue"/>
+			</include>
+		</context>
+		
+		<context id="file-string" style-ref="string" end-at-line-end="true"
+			class="string" class-disabled="no-spell-check">
+			<start>\'</start>
+			<end>\'</end>
+			<include>
+				<context ref="escaped-character"/>
+				<context ref="escaped-brackets"/>
+				<context ref="def:line-continue"/>
+			</include>
+		</context>
+		
+		<context id="multiline-string" style-ref="string" 
+			end-at-line-end="false" class="string" 
+			class-disabled="no-spell-check">
+			<start>\{\"</start>
+			<end>\"\}</end>
+			<include>
+				<context ref="escaped-character"/>
+				<context ref="escaped-brackets"/>
+				<context ref="def:line-continue"/>
+			</include>
+		</context>
+	</definitions>
+</language>
