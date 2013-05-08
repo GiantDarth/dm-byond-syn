@@ -157,9 +157,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 		</context>
 
 		<!-- FIXME Based upon the DM Reference, so some may be missing. -->
-	    <context id="primitives" style-ref="type">
-	    	<keyword>datum</keyword>
-	    	<keyword>atom</keyword>
+		<context id="primitives" style-ref="type">
+			<keyword>datum</keyword>
+			<keyword>atom</keyword>
 			<keyword>area</keyword>
 			<keyword>turf</keyword>
 			<keyword>obj</keyword>
