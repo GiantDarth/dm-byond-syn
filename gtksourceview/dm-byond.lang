@@ -71,7 +71,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 				<context ref="preprocessor"/>
 				<context ref="include"/>
 				<context ref="keywords"/>
-				<context ref="primitives"/>
+				<context ref="types"/>
 				<context ref="null-value"/>
 				<context ref="decimal"/>
 				<context ref="real"/>
@@ -154,10 +154,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 			<keyword>continue</keyword>
 			<keyword>goto</keyword>
 			<keyword>return</keyword>
+			<keyword>to</keyword>
+			<keyword>sleep</keyword>
+			<keyword>spawn</keyword>
 		</context>
 
 		<!-- FIXME Based upon the DM Reference, so some may be missing. -->
-		<context id="primitives" style-ref="type">
+		<context id="types" style-ref="type">
 			<keyword>datum</keyword>
 			<keyword>atom</keyword>
 			<keyword>area</keyword>
